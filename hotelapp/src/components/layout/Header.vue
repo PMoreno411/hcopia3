@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuth } from "../../composables/useAuth";
 
@@ -32,6 +32,16 @@ const irADashboard = () => {
 const irAInicio = () => {
   router.push("/");
 };
+
+const menuAbierto = ref(false);
+
+const toggleMenu = () => {
+  menuAbierto.value = !menuAbierto.value;
+};
+
+const cerrarMenu = () => {
+  menuAbierto.value = false;
+};
 </script>
 
 <template>
@@ -53,14 +63,18 @@ const irAInicio = () => {
         <button
           class="navbar-toggler border-0"
           type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarMain"
+          @click="toggleMenu"
+          :class="{ collapsed: !menuAbierto }"
         >
           <span class="navbar-toggler-icon"></span>
         </button>
 
         <!-- Navigation items -->
-        <div class="collapse navbar-collapse" id="navbarMain">
+        <div
+          class="collapse navbar-collapse"
+          :class="{ show: menuAbierto }"
+          id="navbarMain"
+        >
           <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center gap-2">
             <!-- Hoteles -->
             <li class="nav-item">
@@ -68,6 +82,7 @@ const irAInicio = () => {
                 to="/"
                 class="nav-link-custom"
                 :class="{ active: isActive('/') || isActive('/hotel') }"
+                @click="cerrarMenu"
               >
                 <i class="bi bi-house-door-fill"></i>
                 <span>Hoteles</span>
@@ -80,6 +95,7 @@ const irAInicio = () => {
                 to="/magazine"
                 class="nav-link-custom"
                 :class="{ active: isActive('/magazine') }"
+                @click="cerrarMenu"
               >
                 <i class="bi bi-journal-text"></i>
                 <span>Magazine</span>
@@ -94,54 +110,49 @@ const irAInicio = () => {
                   to="/admin"
                   class="nav-link-custom"
                   :class="{ active: isActive('/admin') }"
+                  @click="cerrarMenu"
                 >
                   <i class="bi bi-shield-lock-fill"></i>
                   <span>Admin</span>
                 </router-link>
               </li>
 
-              <!-- User info -->
-              <li class="nav-item dropdown ms-lg-1">
-                <a
-                  class="nav-link dropdown-toggle user-dropdown"
-                  href="#"
-                  role="button"
-                  data-bs-toggle="dropdown"
+              <!-- Dashboard -->
+              <li class="nav-item">
+                <router-link
+                  to="/dashboard"
+                  class="nav-link-custom"
+                  :class="{ active: isActive('/dashboard') }"
+                  @click="cerrarMenu"
                 >
-                  <div class="user-avatar">
-                    <i class="bi bi-person-circle"></i>
-                  </div>
-                  <span class="user-name">
-                    {{ user.displayName || user.email?.split("@")[0] }}
-                  </span>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end">
-                  <li>
-                    <router-link to="/dashboard" class="dropdown-item">
-                      <i class="bi bi-speedometer2 me-2"></i>
-                      Mi Panel
-                    </router-link>
-                  </li>
-                  <li><hr class="dropdown-divider" /></li>
-                  <li>
-                    <a
-                      class="dropdown-item text-danger"
-                      @click="$emit('logout')"
-                      role="button"
-                    >
-                      <i class="bi bi-box-arrow-right me-2"></i>
-                      Cerrar Sesión
-                    </a>
-                  </li>
-                </ul>
+                  <i class="bi bi-speedometer2"></i>
+                  <span>Mi Panel</span>
+                </router-link>
+              </li>
+
+              <!-- Cerrar sesión -->
+              <li class="nav-item">
+                <button
+                  @click="
+                    $emit('logout');
+                    cerrarMenu();
+                  "
+                  class="nav-link-custom btn-logout-mobile"
+                >
+                  <i class="bi bi-box-arrow-right"></i>
+                  <span>Cerrar Sesión</span>
+                </button>
               </li>
             </template>
 
             <!-- Si NO está logueado -->
             <template v-else>
-              <li class="nav-item ms-lg-1">
+              <li class="nav-item">
                 <button
-                  @click="onOpenLogin"
+                  @click="
+                    onOpenLogin();
+                    cerrarMenu();
+                  "
                   class="nav-link-custom btn-login-style"
                 >
                   <i class="bi bi-box-arrow-in-right"></i>
@@ -226,6 +237,7 @@ const irAInicio = () => {
   text-decoration: none;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  width: auto;
 }
 
 .nav-link-custom i {
@@ -261,6 +273,19 @@ const irAInicio = () => {
   background: #f8f9ff !important;
   color: #667eea !important;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2), 0 3px 10px rgba(102, 126, 234, 0.3);
+}
+
+/* Botón de logout mobile con mismo estilo */
+.btn-logout-mobile {
+  background: #ef4444 !important;
+  color: #fff !important;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-logout-mobile:hover {
+  background: #dc2626 !important;
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
 }
 
 /* User Dropdown */
@@ -348,14 +373,17 @@ const irAInicio = () => {
 /* Responsive */
 @media (max-width: 991px) {
   .navbar-collapse {
-    background: rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
     border-radius: 12px;
     padding: 1rem;
     margin-top: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
 
   .nav-item {
     margin: 0.25rem 0;
+    width: 100%;
   }
 
   .navbar-nav {
@@ -364,11 +392,24 @@ const irAInicio = () => {
 
   .nav-link-custom {
     width: 100%;
+    justify-content: flex-start;
+    padding: 0.75rem 1.25rem !important;
+    font-size: 0.95rem;
   }
 
+  .nav-link-custom i {
+    font-size: 1.1rem;
+    min-width: 24px;
+  }
+
+  .nav-link-custom span {
+    flex: 1;
+    text-align: left;
+  }
+
+  /* Dropdown eliminado en móvil */
   .user-dropdown {
-    width: 100%;
-    justify-content: space-between;
+    display: none;
   }
 }
 </style>

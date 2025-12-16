@@ -349,14 +349,14 @@ watch(
 
 .modal-header {
   border-bottom: 1px solid #f0f0f0;
-  padding: 1.5rem 2rem;
+  padding: 1rem 1.5rem;
   background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
 }
 
 .modal-title {
   color: #2d3561;
   font-weight: 700;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   display: flex;
   align-items: center;
 }
@@ -367,6 +367,7 @@ watch(
 
 .modal-body {
   position: relative;
+  padding: 0 !important;
 }
 
 .map-info {
@@ -375,13 +376,14 @@ watch(
   left: 50%;
   transform: translateX(-50%);
   background: rgba(255, 255, 255, 0.95);
-  padding: 0.75rem 1.5rem;
+  padding: 0.6rem 1.25rem;
   border-radius: 50px;
   font-weight: 600;
   color: #2d3561;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 1000;
   backdrop-filter: blur(10px);
+  font-size: 0.9rem;
 }
 
 .map-info i {
@@ -391,7 +393,7 @@ watch(
 .map-full {
   width: 100%;
   height: 70vh;
-  min-height: 500px;
+  min-height: 400px;
 }
 
 /* Geolocalización - ABAJO CENTRO */
@@ -422,23 +424,37 @@ watch(
   transform: translateX(-50%) scale(1.1);
 }
 
+/* Móviles */
 @media (max-width: 768px) {
+  .modal-fullscreen-lg-down {
+    max-width: 100%;
+    margin: 0;
+    height: 100vh;
+  }
+
+  .modal-fullscreen-lg-down .modal-content {
+    height: 100vh;
+    border-radius: 0;
+  }
+
   .modal-header {
-    padding: 1rem 1.5rem;
+    padding: 0.875rem 1.25rem;
+    border-radius: 0;
   }
 
   .modal-title {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
 
   .map-full {
-    height: 60vh;
-    min-height: 400px;
+    height: calc(100vh - 60px);
+    min-height: unset;
   }
 
   .map-info {
-    font-size: 0.85rem;
-    padding: 0.6rem 1.25rem;
+    font-size: 0.8rem;
+    padding: 0.5rem 1rem;
+    top: 0.75rem;
   }
 
   .btn-geolocate {
@@ -450,6 +466,21 @@ watch(
 
   .btn-geolocate:hover {
     transform: translateX(-50%) scale(1.1);
+  }
+}
+
+/* Pantallas muy pequeñas */
+@media (max-width: 480px) {
+  .map-info {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.875rem;
+  }
+
+  .btn-geolocate {
+    width: 38px;
+    height: 38px;
+    font-size: 1rem;
+    bottom: 0.875rem;
   }
 }
 </style>

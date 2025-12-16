@@ -186,10 +186,73 @@ const getIcon = () => {
 /* Responsive */
 @media (max-width: 768px) {
   .toast-container {
+    top: 80px;
     right: 1rem;
     left: 1rem;
     min-width: auto;
-    max-width: calc(100% - 2rem);
+    max-width: none;
+    width: calc(100% - 2rem);
+  }
+
+  .toast-content {
+    padding: 1rem;
+  }
+
+  .toast-icon {
+    font-size: 1.25rem;
+  }
+
+  .toast-message {
+    font-size: 0.9rem;
+  }
+
+  /* Animaciones en móviles - desde arriba */
+  .toast-enter-active {
+    animation: slideInDown 0.3s ease;
+  }
+
+  .toast-leave-active {
+    animation: slideOutUp 0.3s ease;
+  }
+
+  @keyframes slideInDown {
+    from {
+      transform: translateY(-100px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideOutUp {
+    from {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateY(-100px);
+      opacity: 0;
+    }
+  }
+}
+
+/* Pantallas muy pequeñas */
+@media (max-width: 480px) {
+  .toast-container {
+    top: 70px;
+    right: 0.75rem;
+    left: 0.75rem;
+    width: calc(100% - 1.5rem);
+  }
+
+  .toast-content {
+    padding: 0.875rem;
+  }
+
+  .toast-message {
+    font-size: 0.85rem;
   }
 }
 </style>

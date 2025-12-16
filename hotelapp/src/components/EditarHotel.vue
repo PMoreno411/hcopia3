@@ -4,6 +4,8 @@ import { useRouter, useRoute } from "vue-router";
 import { useAuth } from "../composables/useAuth";
 import { useFirestore } from "../composables/useFirestore";
 import { useStorage } from "../composables/useStorage";
+import { useToast } from "../composables/useToast";
+import { useConfirm } from "../composables/useConfirm";
 
 const props = defineProps({
   hotelId: {
@@ -27,6 +29,8 @@ const {
   deleteMultipleFiles,
   isPending: uploadingImages,
 } = useStorage();
+const { success, error, warning } = useToast();
+const { confirm } = useConfirm();
 
 const hotelIdActual = ref(props.isModal ? props.hotelId : route.params.id);
 const cargando = ref(true);
@@ -85,8 +89,13 @@ const handleImagenesNuevas = (event) => {
   });
 };
 
-const eliminarImagenExistente = (index, url) => {
-  if (confirm("¿Eliminar esta imagen?")) {
+const eliminarImagenExistente = async (index, url) => {
+  const confirmed = await confirm(
+    "¿Eliminar esta imagen?",
+    "Confirmar eliminación"
+  );
+
+  if (confirmed) {
     formulario.value.imagenes.splice(index, 1);
     imagenesAEliminar.value.push(url);
   }
@@ -104,7 +113,7 @@ const handlePrecioUsdChange = () => {
 
 const actualizarHotel = async () => {
   if (!formulario.value.precioCop && !formulario.value.precio) {
-    alert("Ingresa el precio en COP");
+    warning("Ingresa el precio en COP");
     return;
   }
   handlePrecioCopChange();
@@ -148,16 +157,16 @@ const actualizarHotel = async () => {
     };
 
     await updateDocument(hotelIdActual.value, hotelData);
-    alert("¡Hotel actualizado exitosamente!");
+    success("¡Hotel actualizado exitosamente!");
 
     if (props.isModal) {
       emit("hotel-actualizado");
     } else {
       router.push("/dashboard");
     }
-  } catch (error) {
-    console.error("Error al actualizar hotel:", error);
-    alert("Error al actualizar el hotel: " + error.message);
+  } catch (err) {
+    console.error("Error al actualizar hotel:", err);
+    error("Error al actualizar el hotel");
   }
 };
 
@@ -175,7 +184,7 @@ const cargarHotel = async () => {
     const hotel = await getDocument(hotelIdActual.value);
 
     if (hotel.userId !== user.value?.uid) {
-      alert("No tienes permiso para editar este hotel");
+      warning("No tienes permiso para editar este hotel");
       if (props.isModal) {
         emit("cancelar");
       } else {
@@ -200,7 +209,7 @@ const cargarHotel = async () => {
     };
   } catch (err) {
     console.error("Error al cargar hotel:", err);
-    alert("Error al cargar el hotel");
+    error("Error al cargar el hotel");
     if (props.isModal) {
       emit("cancelar");
     } else {

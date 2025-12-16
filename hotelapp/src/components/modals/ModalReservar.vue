@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { useAuth } from "../../composables/useAuth";
 import { useReservas } from "../../composables/useReservas";
 import { useToast } from "../../composables/useToast";
@@ -58,6 +58,20 @@ const fechaMinimaCheckout = computed(() => {
   return checkIn.toISOString().split("T")[0];
 });
 
+const opcionesAdultos = computed(() => {
+  if (!props.habitacion?.capacidad) return [1, 2, 3, 4];
+  return Array.from({ length: props.habitacion.capacidad }, (_, i) => i + 1);
+});
+
+const opcionesNinos = computed(() => {
+  if (!props.habitacion?.capacidad) return [0, 1, 2, 3];
+  const maxNinos = Math.max(
+    0,
+    props.habitacion.capacidad - formulario.value.numeroAdultos
+  );
+  return Array.from({ length: maxNinos + 1 }, (_, i) => i);
+});
+
 const enviarReserva = async () => {
   if (!user.value) {
     warning("Debes iniciar sesión para reservar");
@@ -101,6 +115,12 @@ const enviarReserva = async () => {
     warning(
       `Esta habitación tiene capacidad máxima de ${props.habitacion.capacidad} personas`
     );
+    return;
+  }
+
+  // Validar al menos 1 adulto
+  if (formulario.value.numeroAdultos < 1) {
+    warning("Debe haber al menos 1 adulto");
     return;
   }
 
@@ -174,6 +194,46 @@ const limpiarFormulario = () => {
     solicitudesEspeciales: "",
   };
 };
+
+// Cargar datos del usuario automáticamente y ajustar capacidad
+watch(
+  () => props.isOpen,
+  (newVal) => {
+    if (newVal) {
+      if (user.value) {
+        formulario.value.nombreHuesped = user.value.displayName || "";
+        formulario.value.email = user.value.email || "";
+      }
+
+      // Ajustar número de adultos según capacidad
+      if (props.habitacion?.capacidad) {
+        formulario.value.numeroAdultos = Math.min(
+          2,
+          props.habitacion.capacidad
+        );
+        formulario.value.numeroNinos = 0;
+      }
+
+      // Prevenir scroll del body
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+  }
+);
+
+// Watch para ajustar niños cuando cambia adultos
+watch(
+  () => formulario.value.numeroAdultos,
+  (newVal) => {
+    if (props.habitacion?.capacidad) {
+      const maxNinos = props.habitacion.capacidad - newVal;
+      if (formulario.value.numeroNinos > maxNinos) {
+        formulario.value.numeroNinos = maxNinos;
+      }
+    }
+  }
+);
 </script>
 
 <template>
@@ -308,10 +368,13 @@ const limpiarFormulario = () => {
                       v-model.number="formulario.numeroAdultos"
                       class="form-select"
                     >
-                      <option :value="1">1 Adulto</option>
-                      <option :value="2">2 Adultos</option>
-                      <option :value="3">3 Adultos</option>
-                      <option :value="4">4 Adultos</option>
+                      <option
+                        v-for="num in opcionesAdultos"
+                        :key="num"
+                        :value="num"
+                      >
+                        {{ num }} Adulto{{ num > 1 ? "s" : "" }}
+                      </option>
                     </select>
                   </div>
                   <div class="col-md-6 mb-3">
@@ -320,11 +383,24 @@ const limpiarFormulario = () => {
                       v-model.number="formulario.numeroNinos"
                       class="form-select"
                     >
-                      <option :value="0">Sin niños</option>
-                      <option :value="1">1 Niño</option>
-                      <option :value="2">2 Niños</option>
-                      <option :value="3">3 Niños</option>
+                      <option
+                        v-for="num in opcionesNinos"
+                        :key="num"
+                        :value="num"
+                      >
+                        {{
+                          num === 0
+                            ? "Sin niños"
+                            : `${num} Niño${num > 1 ? "s" : ""}`
+                        }}
+                      </option>
                     </select>
+                    <small class="text-muted">
+                      Capacidad máxima:
+                      {{ habitacion?.capacidad || 0 }} persona{{
+                        (habitacion?.capacidad || 0) > 1 ? "s" : ""
+                      }}
+                    </small>
                   </div>
                 </div>
               </div>
@@ -417,7 +493,11 @@ const limpiarFormulario = () => {
                   <i class="bi bi-x-circle me-2"></i>
                   Cancelar
                 </button>
-                <button type="submit" class="btn-modal-primary" :disabled="isPending">
+                <button
+                  type="submit"
+                  class="btn-modal-primary"
+                  :disabled="isPending"
+                >
                   <i class="bi bi-check-circle me-2"></i>
                   Solicitar Reserva
                 </button>
@@ -466,6 +546,24 @@ const limpiarFormulario = () => {
   padding: 2rem;
   max-height: calc(100vh - 200px);
   overflow-y: auto;
+}
+
+.modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: #667eea;
+  border-radius: 10px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: #764ba2;
 }
 
 .reserva-info-card {

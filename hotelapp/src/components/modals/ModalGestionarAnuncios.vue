@@ -126,13 +126,27 @@ const calcularFechas = () => {
   const fin = new Date(inicio);
   fin.setDate(fin.getDate() + plan.duracion);
 
+  // Guardar como string ISO para máxima compatibilidad
   nuevoAnuncio.value.fechaInicio = inicio.toISOString();
   nuevoAnuncio.value.fechaFin = fin.toISOString();
+
+  console.log("📅 Fechas calculadas:", {
+    inicio: nuevoAnuncio.value.fechaInicio,
+    fin: nuevoAnuncio.value.fechaFin,
+    duracion: plan.duracion,
+  });
 };
 
 const calcularDiasRestantes = (fechaFin) => {
+  if (!fechaFin) return 0;
+
   const ahora = new Date();
-  const fin = new Date(fechaFin);
+  // Manejar tanto timestamps de Firestore como strings ISO
+  const fin =
+    typeof fechaFin === "string"
+      ? new Date(fechaFin)
+      : new Date(fechaFin.seconds ? fechaFin.seconds * 1000 : fechaFin);
+
   const diferencia = fin - ahora;
   const dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
   return dias > 0 ? dias : 0;
@@ -162,28 +176,32 @@ const crearAnuncio = async () => {
       `ads/${user.value.uid}/${Date.now()}_comprobante`
     );
 
+    // Calcular fechas ANTES de crear el anuncio
     calcularFechas();
 
     const anuncioData = {
-      ...nuevoAnuncio.value,
+      titulo: nuevoAnuncio.value.titulo,
+      descripcion: nuevoAnuncio.value.descripcion,
+      url: nuevoAnuncio.value.url,
       imagen: resultadoImagen.url,
       comprobantePago: resultadoComprobante.url,
-      posicion: "header",
+      plan: planesPublicidad.value[nuevoAnuncio.value.plan],
+      estadoPago: "pendiente",
+      activo: false,
+      fechaInicio: nuevoAnuncio.value.fechaInicio, // ✅ Incluir fecha inicio
+      fechaFin: nuevoAnuncio.value.fechaFin, // ✅ Incluir fecha fin
       userId: user.value.uid,
       userName: user.value.displayName || user.value.email,
       impresiones: 0,
-      plan: planesPublicidad.value[nuevoAnuncio.value.plan],
-      activo: false,
-      estadoPago: "pendiente",
+      clics: 0,
     };
 
-    await addDocument(anuncioData);
-    success("¡Solicitud enviada! Revisaremos tu pago pronto.");
+    console.log("📦 Datos del anuncio a guardar:", anuncioData);
 
+    await addDocument(anuncioData);
+    success("¡Anuncio creado! Espera la aprobación del admin.");
+    emit("anuncio-gestionado");
     limpiarFormulario();
-    vistaActual.value = "lista";
-    await cargarMisAnuncios();
-    emit("anuncioGestionado");
   } catch (err) {
     console.error("Error:", err);
     error("Error al crear anuncio");

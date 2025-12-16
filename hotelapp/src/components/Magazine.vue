@@ -5,6 +5,8 @@ import { useAuth } from "../composables/useAuth";
 import { useFirestore } from "../composables/useFirestore";
 import { useModal } from "../composables/useModal";
 import { useStorage } from "../composables/useStorage";
+import { useToast } from "../composables/useToast";
+import { useConfirm } from "../composables/useConfirm";
 import ModalArticulo from "./modals/ModalArticulo.vue";
 import Spinner from "./common/Spinner.vue";
 
@@ -17,6 +19,8 @@ const {
   openModal: openArticulo,
   closeModal: closeArticulo,
 } = useModal();
+const { success, error } = useToast();
+const { confirmDelete } = useConfirm();
 
 const articulos = ref([]);
 const cargando = ref(true);

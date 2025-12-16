@@ -30,6 +30,7 @@ const {
 } = useStorage();
 
 const { success, error, warning } = useToast();
+const { confirm } = useConfirm();
 
 const resetForm = () => ({
   nombre: "",

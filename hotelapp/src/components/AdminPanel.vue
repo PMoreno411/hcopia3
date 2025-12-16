@@ -82,7 +82,7 @@ const articulosFiltrados = computed(() => {
   return todosArticulos.value.filter(
     (a) =>
       a.titulo?.toLowerCase().includes(termino) ||
-      a.autor?.toLowerCase().includes(termino)
+      a.autorNombre?.toLowerCase().includes(termino)
   );
 });
 
@@ -392,8 +392,15 @@ const toggleVisibilidadArticulo = async (articuloId, estadoActual) => {
 };
 
 const calcularDiasRestantes = (fechaFin) => {
+  if (!fechaFin) return 0;
+
   const ahora = new Date();
-  const fin = new Date(fechaFin);
+  // Manejar tanto timestamps de Firestore como strings ISO
+  const fin =
+    typeof fechaFin === "string"
+      ? new Date(fechaFin)
+      : new Date(fechaFin.seconds ? fechaFin.seconds * 1000 : fechaFin);
+
   const diferencia = fin - ahora;
   const dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
   return dias > 0 ? dias : 0;
@@ -401,7 +408,14 @@ const calcularDiasRestantes = (fechaFin) => {
 
 const formatearFecha = (fecha) => {
   if (!fecha) return "N/A";
-  const date = fecha.seconds ? new Date(fecha.seconds * 1000) : new Date(fecha);
+  // Manejar tanto timestamps de Firestore como strings ISO
+  const date =
+    typeof fecha === "string"
+      ? new Date(fecha)
+      : fecha.seconds
+      ? new Date(fecha.seconds * 1000)
+      : new Date(fecha);
+
   return date.toLocaleDateString("es-CO", {
     year: "numeric",
     month: "short",
@@ -1036,7 +1050,7 @@ onMounted(async () => {
                 <td>
                   <strong>{{ articulo.titulo }}</strong>
                 </td>
-                <td>{{ articulo.autor }}</td>
+                <td>{{ articulo.autorNombre }}</td>
                 <td>
                   <span class="badge-table badge-plan-table">{{
                     articulo.categoria

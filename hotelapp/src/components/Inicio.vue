@@ -72,13 +72,23 @@ const cargarAnuncios = async () => {
   try {
     const filters = [
       { type: "where", field: "activo", operator: "==", value: true },
+      { type: "where", field: "estadoPago", operator: "==", value: "aprobado" },
     ];
     const anuncios = await getAds(filters);
 
     const ahora = new Date();
     anunciosActivos.value = anuncios
       .filter((ad) => {
-        const fin = new Date(ad.fechaFin);
+        if (!ad.fechaFin) return false;
+
+        // Manejar tanto timestamps de Firestore como strings ISO
+        const fin =
+          typeof ad.fechaFin === "string"
+            ? new Date(ad.fechaFin)
+            : new Date(
+                ad.fechaFin.seconds ? ad.fechaFin.seconds * 1000 : ad.fechaFin
+              );
+
         return fin > ahora;
       })
       .map((ad) => ({
@@ -89,10 +99,16 @@ const cargarAnuncios = async () => {
         impresiones: ad.impresiones || 0,
       }));
 
-    // Registrar impresiones de todos los anuncios visibles
-    anunciosActivos.value.forEach((ad) => {
-      registrarImpresion(ad.id);
-    });
+    // Registrar impresiones solo una vez por sesión
+    if (
+      anunciosActivos.value.length > 0 &&
+      !sessionStorage.getItem("impressionsRegistered")
+    ) {
+      anunciosActivos.value.forEach((ad) => {
+        registrarImpresion(ad.id);
+      });
+      sessionStorage.setItem("impressionsRegistered", "true");
+    }
   } catch (err) {
     console.error("Error al cargar anuncios:", err);
   }

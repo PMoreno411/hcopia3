@@ -12,6 +12,7 @@ import ModalRegistrarHotel from "./modals/ModalRegistrarHotel.vue";
 import ModalEditarHotel from "./modals/ModalEditarHotel.vue";
 import ModalGestionarAnuncios from "./modals/ModalGestionarAnuncios.vue";
 import ModalGestionarHabitaciones from "./modals/ModalGestionarHabitaciones.vue";
+import ModalRechazarReserva from "./modals/ModalRechazarReserva.vue";
 import Spinner from "./common/Spinner.vue";
 import RatingStars from "./common/RatingStars.vue";
 import BadgeDestacado from "./common/BadgeDestacado.vue";
@@ -286,28 +287,17 @@ const confirmarReservaHotel = async (reservaId, habitacionId) => {
 
 const modalRechazarReservaOpen = ref(false);
 const reservaARechazar = ref(null);
-const motivoRechazoReserva = ref("");
 
 const abrirRechazarReserva = (reserva) => {
   reservaARechazar.value = reserva;
-  motivoRechazoReserva.value = "";
   modalRechazarReservaOpen.value = true;
 };
 
-const confirmarRechazoReserva = async () => {
-  if (!motivoRechazoReserva.value.trim()) {
-    warning("Por favor ingresa un motivo de rechazo");
-    return;
-  }
-
+const confirmarRechazoReserva = async (motivo) => {
   try {
-    await rechazarReserva(
-      reservaARechazar.value.id,
-      motivoRechazoReserva.value.trim()
-    );
+    await rechazarReserva(reservaARechazar.value.id, motivo);
     warning("Reserva rechazada");
     modalRechazarReservaOpen.value = false;
-    motivoRechazoReserva.value = "";
     reservaARechazar.value = null;
     await cargarReservasDeHotel();
   } catch (err) {
@@ -318,7 +308,6 @@ const confirmarRechazoReserva = async () => {
 
 const cancelarRechazoReserva = () => {
   modalRechazarReservaOpen.value = false;
-  motivoRechazoReserva.value = "";
   reservaARechazar.value = null;
 };
 
@@ -611,10 +600,6 @@ const eliminarReservaHotel = async (reserva) => {
             <i class="bi bi-inbox"></i>
             <h3>No tienes hoteles registrados</h3>
             <p>Comienza registrando tu primer hotel</p>
-            <!-- <button @click="openRegistrar" class="btn-empty-action">
-              <i class="bi bi-plus-circle me-2"></i>
-              Registrar tu primer hotel
-            </button> -->
           </div>
 
           <!-- Lista de hoteles -->
@@ -748,115 +733,127 @@ const eliminarReservaHotel = async (reserva) => {
               :key="reserva.id"
               class="reserva-card"
             >
-              <div class="reserva-header">
-                <h4 class="reserva-hotel">{{ reserva.hotelNombre }}</h4>
-                <span
-                  :class="[
-                    'badge-estado-reserva',
-                    estadoBadgeClass(reserva.estado),
-                  ]"
-                >
-                  {{ estadoTexto(reserva.estado) }}
-                </span>
-              </div>
-
-              <div class="reserva-info">
-                <div class="info-item">
-                  <i class="bi bi-door-open-fill"></i>
-                  <span>{{ reserva.habitacionNombre }}</span>
-                </div>
-                <div class="info-item">
-                  <i class="bi bi-moon-stars-fill"></i>
-                  <span>{{ reserva.habitacionCamas }}</span>
-                </div>
-              </div>
-
-              <div class="reserva-fechas">
-                <div class="fecha-item">
-                  <span class="fecha-label">Check-in</span>
-                  <strong>{{
-                    new Date(reserva.checkIn).toLocaleDateString("es-CO")
-                  }}</strong>
-                </div>
-                <div class="fecha-divider">
-                  <i class="bi bi-arrow-right"></i>
-                </div>
-                <div class="fecha-item">
-                  <span class="fecha-label">Check-out</span>
-                  <strong>{{
-                    new Date(reserva.checkOut).toLocaleDateString("es-CO")
-                  }}</strong>
-                </div>
-              </div>
-
-              <div class="reserva-detalles">
-                <div class="detalle-row">
-                  <span>Noches:</span>
-                  <strong>{{ reserva.noches }}</strong>
-                </div>
-                <div class="detalle-row">
-                  <span>Huéspedes:</span>
-                  <strong
-                    >{{ reserva.numeroAdultos }} adulto{{
-                      reserva.numeroAdultos > 1 ? "s" : ""
-                    }}{{
-                      reserva.numeroNinos > 0
-                        ? `, ${reserva.numeroNinos} niño${
-                            reserva.numeroNinos > 1 ? "s" : ""
-                          }`
-                        : ""
-                    }}</strong
+              <div class="reserva-card-content">
+                <div class="reserva-header">
+                  <div>
+                    <h4 class="reserva-hotel">{{ reserva.hotelNombre }}</h4>
+                  </div>
+                  <span
+                    :class="[
+                      'badge-estado-reserva',
+                      estadoBadgeClass(reserva.estado),
+                    ]"
                   >
+                    {{ estadoTexto(reserva.estado) }}
+                  </span>
                 </div>
-                <div class="detalle-row total">
-                  <span>Total:</span>
-                  <strong
-                    >${{
-                      (reserva.precioTotal || 0).toLocaleString("es-CO")
-                    }}
-                    COP</strong
+
+                <div class="reserva-info">
+                  <div class="info-item">
+                    <i class="bi bi-door-open-fill"></i>
+                    <span>{{ reserva.habitacionNombre }}</span>
+                  </div>
+                  <div class="info-item">
+                    <i class="bi bi-moon-stars-fill"></i>
+                    <span>{{ reserva.habitacionCamas }}</span>
+                  </div>
+                </div>
+
+                <div class="reserva-fechas">
+                  <div class="fecha-item">
+                    <span class="fecha-label">Check-in</span>
+                    <strong>{{
+                      new Date(reserva.checkIn).toLocaleDateString("es-CO")
+                    }}</strong>
+                  </div>
+                  <div class="fecha-divider">
+                    <i class="bi bi-arrow-right"></i>
+                  </div>
+                  <div class="fecha-item">
+                    <span class="fecha-label">Check-out</span>
+                    <strong>{{
+                      new Date(reserva.checkOut).toLocaleDateString("es-CO")
+                    }}</strong>
+                  </div>
+                </div>
+
+                <div class="reserva-detalles">
+                  <div class="detalle-row">
+                    <span>Noches:</span>
+                    <strong>{{ reserva.noches }}</strong>
+                  </div>
+                  <div class="detalle-row">
+                    <span>Huéspedes:</span>
+                    <strong
+                      >{{ reserva.numeroAdultos }} adulto{{
+                        reserva.numeroAdultos > 1 ? "s" : ""
+                      }}{{
+                        reserva.numeroNinos > 0
+                          ? `, ${reserva.numeroNinos} niño${
+                              reserva.numeroNinos > 1 ? "s" : ""
+                            }`
+                          : ""
+                      }}</strong
+                    >
+                  </div>
+                  <div class="detalle-row total">
+                    <span>Total:</span>
+                    <strong
+                      >${{
+                        (reserva.precioTotal || 0).toLocaleString("es-CO")
+                      }}
+                      COP</strong
+                    >
+                  </div>
+                </div>
+
+                <div
+                  v-if="reserva.estado === 'rechazada' && reserva.motivoRechazo"
+                  class="motivo-rechazo-box"
+                >
+                  <strong>Motivo del rechazo:</strong>
+                  <p>{{ reserva.motivoRechazo }}</p>
+                </div>
+
+                <div
+                  class="reserva-actions"
+                  :class="{
+                    'single-action':
+                      reserva.estado !== 'pendiente' &&
+                      reserva.estado !== 'confirmada',
+                  }"
+                >
+                  <button
+                    v-if="
+                      reserva.estado === 'pendiente' ||
+                      reserva.estado === 'confirmada'
+                    "
+                    @click="
+                      cancelarMiReserva(
+                        reserva.id,
+                        reserva.habitacionId,
+                        reserva.estado
+                      )
+                    "
+                    class="btn-action btn-delete"
                   >
+                    <i class="bi bi-x-circle"></i>
+                    <span class="d-none d-lg-inline">Cancelar</span>
+                  </button>
+                  <button
+                    v-if="
+                      ['cancelada', 'rechazada', 'completada'].includes(
+                        reserva.estado
+                      )
+                    "
+                    @click="eliminarReservaUsuario(reserva)"
+                    class="btn-action btn-delete"
+                    title="Eliminar"
+                  >
+                    <i class="bi bi-trash"></i>
+                    <span class="d-none d-lg-inline">Eliminar</span>
+                  </button>
                 </div>
-              </div>
-
-              <div
-                v-if="reserva.estado === 'rechazada' && reserva.motivoRechazo"
-                class="motivo-rechazo-box"
-              >
-                <strong>Motivo del rechazo:</strong>
-                <p>{{ reserva.motivoRechazo }}</p>
-              </div>
-
-              <div class="reserva-actions">
-                <button
-                  v-if="
-                    reserva.estado === 'pendiente' ||
-                    reserva.estado === 'confirmada'
-                  "
-                  @click="
-                    cancelarMiReserva(
-                      reserva.id,
-                      reserva.habitacionId,
-                      reserva.estado
-                    )
-                  "
-                  class="btn-cancelar-reserva"
-                >
-                  <i class="bi bi-x-circle me-2"></i>
-                  Cancelar Reserva
-                </button>
-                <button
-                  v-else-if="
-                    ['cancelada', 'rechazada', 'completada'].includes(
-                      reserva.estado
-                    )
-                  "
-                  @click="eliminarReservaUsuario(reserva)"
-                  class="btn btn-outline-danger btn-sm ms-auto"
-                  title="Eliminar"
-                >
-                  <i class="bi bi-trash"></i>
-                </button>
               </div>
             </div>
           </div>
@@ -890,195 +887,190 @@ const eliminarReservaHotel = async (reserva) => {
             <div
               v-for="reserva in reservasDeHotel"
               :key="reserva.id"
-              class="reserva-card reserva-hotel-card"
+              class="reserva-card"
             >
-              <div class="reserva-header">
-                <div>
-                  <h4 class="reserva-hotel">{{ reserva.hotelNombre }}</h4>
-                  <p class="reserva-huesped">
-                    <i class="bi bi-person-fill me-1"></i>
-                    {{ reserva.nombreHuesped }}
-                  </p>
-                </div>
-                <span
-                  :class="[
-                    'badge-estado-reserva',
-                    estadoBadgeClass(reserva.estado),
-                  ]"
-                >
-                  {{ estadoTexto(reserva.estado) }}
-                </span>
-              </div>
-
-              <div class="reserva-info">
-                <div class="info-item">
-                  <i class="bi bi-door-open-fill"></i>
-                  <span>{{ reserva.habitacionNombre }}</span>
-                </div>
-                <div class="info-item">
-                  <i class="bi bi-envelope-fill"></i>
-                  <span>{{ reserva.email }}</span>
-                </div>
-                <div class="info-item">
-                  <i class="bi bi-telephone-fill"></i>
-                  <span>{{ reserva.telefono }}</span>
-                </div>
-              </div>
-
-              <div class="reserva-fechas">
-                <div class="fecha-item">
-                  <span class="fecha-label">Check-in</span>
-                  <strong>{{
-                    new Date(reserva.checkIn).toLocaleDateString("es-CO")
-                  }}</strong>
-                  <small v-if="reserva.horaLlegada">{{
-                    reserva.horaLlegada
-                  }}</small>
-                </div>
-                <div class="fecha-divider">
-                  <i class="bi bi-arrow-right"></i>
-                </div>
-                <div class="fecha-item">
-                  <span class="fecha-label">Check-out</span>
-                  <strong>{{
-                    new Date(reserva.checkOut).toLocaleDateString("es-CO")
-                  }}</strong>
-                </div>
-              </div>
-
-              <div class="reserva-detalles">
-                <div class="detalle-row">
-                  <span>Noches:</span>
-                  <strong>{{ reserva.noches }}</strong>
-                </div>
-                <div class="detalle-row">
-                  <span>Huéspedes:</span>
-                  <strong
-                    >{{ reserva.numeroAdultos }} adulto{{
-                      reserva.numeroAdultos > 1 ? "s" : ""
-                    }}{{
-                      reserva.numeroNinos > 0
-                        ? `, ${reserva.numeroNinos} niño${
-                            reserva.numeroNinos > 1 ? "s" : ""
-                          }`
-                        : ""
-                    }}</strong
+              <div class="reserva-card-content">
+                <div class="reserva-header">
+                  <div>
+                    <h4 class="reserva-hotel">{{ reserva.hotelNombre }}</h4>
+                    <p class="reserva-huesped">
+                      <i class="bi bi-person-fill me-1"></i>
+                      {{ reserva.nombreHuesped }}
+                    </p>
+                  </div>
+                  <span
+                    :class="[
+                      'badge-estado-reserva',
+                      estadoBadgeClass(reserva.estado),
+                    ]"
                   >
+                    {{ estadoTexto(reserva.estado) }}
+                  </span>
                 </div>
-                <div class="detalle-row total">
-                  <span>Total:</span>
-                  <strong
-                    >${{
-                      reserva.precioTotal.toLocaleString("es-CO")
-                    }}
-                    COP</strong
+
+                <div class="reserva-info">
+                  <div class="info-item">
+                    <i class="bi bi-door-open-fill"></i>
+                    <span>{{ reserva.habitacionNombre }}</span>
+                  </div>
+                  <div class="info-item">
+                    <i class="bi bi-envelope-fill"></i>
+                    <span>{{ reserva.email }}</span>
+                  </div>
+                  <div class="info-item">
+                    <i class="bi bi-telephone-fill"></i>
+                    <span>{{ reserva.telefono }}</span>
+                  </div>
+                </div>
+
+                <div class="reserva-fechas">
+                  <div class="fecha-item">
+                    <span class="fecha-label">Check-in</span>
+                    <strong>{{
+                      new Date(reserva.checkIn).toLocaleDateString("es-CO")
+                    }}</strong>
+                    <small v-if="reserva.horaLlegada">{{
+                      reserva.horaLlegada
+                    }}</small>
+                  </div>
+                  <div class="fecha-divider">
+                    <i class="bi bi-arrow-right"></i>
+                  </div>
+                  <div class="fecha-item">
+                    <span class="fecha-label">Check-out</span>
+                    <strong>{{
+                      new Date(reserva.checkOut).toLocaleDateString("es-CO")
+                    }}</strong>
+                  </div>
+                </div>
+
+                <div class="reserva-detalles">
+                  <div class="detalle-row">
+                    <span>Noches:</span>
+                    <strong>{{ reserva.noches }}</strong>
+                  </div>
+                  <div class="detalle-row">
+                    <span>Huéspedes:</span>
+                    <strong
+                      >{{ reserva.numeroAdultos }} adulto{{
+                        reserva.numeroAdultos > 1 ? "s" : ""
+                      }}{{
+                        reserva.numeroNinos > 0
+                          ? `, ${reserva.numeroNinos} niño${
+                              reserva.numeroNinos > 1 ? "s" : ""
+                            }`
+                          : ""
+                      }}</strong
+                    >
+                  </div>
+                  <div class="detalle-row total">
+                    <span>Total:</span>
+                    <strong
+                      >${{
+                        reserva.precioTotal.toLocaleString("es-CO")
+                      }}
+                      COP</strong
+                    >
+                  </div>
+                </div>
+
+                <div
+                  v-if="reserva.solicitudesEspeciales"
+                  class="solicitudes-especiales"
+                >
+                  <strong>Solicitudes especiales:</strong>
+                  <p>{{ reserva.solicitudesEspeciales }}</p>
+                </div>
+
+                <div
+                  v-if="reserva.estado === 'rechazada' && reserva.motivoRechazo"
+                  class="motivo-rechazo-box"
+                >
+                  <strong>Motivo del rechazo:</strong>
+                  <p>{{ reserva.motivoRechazo }}</p>
+                </div>
+
+                <div
+                  v-else-if="reserva.estado === 'cancelada'"
+                  class="motivo-rechazo-box"
+                >
+                  <strong>Reserva cancelada por el huésped</strong>
+                </div>
+
+                <!-- Acciones para dueño de hotel -->
+                <div
+                  v-if="reserva.estado === 'pendiente'"
+                  class="reserva-actions-hotel"
+                >
+                  <button
+                    @click="
+                      confirmarReservaHotel(reserva.id, reserva.habitacionId)
+                    "
+                    class="btn-confirmar-reserva"
                   >
+                    <i class="bi bi-check-circle"></i>
+                    <span class="d-none d-lg-inline">Confirmar</span>
+                  </button>
+                  <button
+                    @click="abrirRechazarReserva(reserva)"
+                    class="btn-rechazar-reserva"
+                  >
+                    <i class="bi bi-x-circle"></i>
+                    <span class="d-none d-lg-inline">Rechazar</span>
+                  </button>
                 </div>
-              </div>
 
-              <div
-                v-if="reserva.solicitudesEspeciales"
-                class="solicitudes-especiales"
-              >
-                <strong>Solicitudes especiales:</strong>
-                <p>{{ reserva.solicitudesEspeciales }}</p>
-              </div>
-
-              <!-- Acciones para dueño de hotel -->
-              <div
-                v-if="reserva.estado === 'pendiente'"
-                class="reserva-actions-hotel"
-              >
-                <button
-                  @click="
-                    confirmarReservaHotel(reserva.id, reserva.habitacionId)
-                  "
-                  class="btn-confirmar-reserva"
+                <div
+                  v-else-if="reserva.estado === 'confirmada'"
+                  class="reserva-actions-hotel-single"
                 >
-                  <i class="bi bi-check-circle me-2"></i>
-                  Confirmar
-                </button>
-                <button
-                  @click="abrirRechazarReserva(reserva)"
-                  class="btn-rechazar-reserva"
-                >
-                  <i class="bi bi-x-circle me-2"></i>
-                  Rechazar
-                </button>
-              </div>
-
-              <div
-                v-else-if="reserva.estado === 'confirmada'"
-                class="reserva-actions-hotel-single"
-              >
-                <div class="reserva-status-inline">
-                  <i class="bi bi-check-circle-fill me-2"></i>
-                  Confirmada
+                  <div class="reserva-status-inline">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span class="d-none d-lg-inline">Confirmada</span>
+                  </div>
+                  <button
+                    @click="registrarCheckIn(reserva.id)"
+                    class="btn-checkin-reserva"
+                  >
+                    <i class="bi bi-door-open"></i>
+                    <span class="d-none d-lg-inline">Check-In</span>
+                  </button>
                 </div>
-                <button
-                  @click="registrarCheckIn(reserva.id)"
-                  class="btn-checkin-reserva"
-                >
-                  <i class="bi bi-door-open me-2"></i>
-                  Check-In
-                </button>
-              </div>
 
-              <div
-                v-else-if="reserva.estado === 'ocupada'"
-                class="reserva-actions-hotel-single"
-              >
-                <div class="reserva-status-inline reserva-status-ocupada">
-                  <i class="bi bi-person-check-fill me-2"></i>
-                  Estadía
+                <div
+                  v-else-if="reserva.estado === 'ocupada'"
+                  class="reserva-actions-hotel-single"
+                >
+                  <div class="reserva-status-inline reserva-status-ocupada">
+                    <i class="bi bi-person-check-fill"></i>
+                    <span class="d-none d-lg-inline">Estadía</span>
+                  </div>
+                  <button
+                    @click="registrarCheckOut(reserva.id, reserva.habitacionId)"
+                    class="btn-checkout-reserva"
+                  >
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span class="d-none d-lg-inline">Check-Out</span>
+                  </button>
                 </div>
-                <button
-                  @click="registrarCheckOut(reserva.id, reserva.habitacionId)"
-                  class="btn-checkout-reserva"
-                >
-                  <i class="bi bi-box-arrow-right me-2"></i>
-                  Check-Out
-                </button>
-              </div>
 
-              <div
-                v-else-if="reserva.estado === 'completada'"
-                class="reserva-status-completada"
-              >
-                <i class="bi bi-check-all me-2"></i>
-                Reserva completada - Huésped se fue
-              </div>
-
-              <div
-                v-else-if="
-                  reserva.estado === 'rechazada' && reserva.motivoRechazo
-                "
-                class="motivo-rechazo-box"
-              >
-                <strong>Motivo del rechazo:</strong>
-                <p>{{ reserva.motivoRechazo }}</p>
-              </div>
-
-              <div
-                v-else-if="reserva.estado === 'cancelada'"
-                class="motivo-rechazo-box"
-              >
-                <strong>Reserva cancelada por el huésped</strong>
-              </div>
-
-              <div class="reserva-actions mt-2">
-                <button
-                  v-if="
+                <div
+                  v-else-if="
                     ['cancelada', 'rechazada', 'completada'].includes(
                       reserva.estado
                     )
                   "
-                  @click="eliminarReservaHotel(reserva)"
-                  class="btn btn-outline-danger btn-sm"
-                  title="Eliminar"
+                  class="reserva-actions single-action"
                 >
-                  <i class="bi bi-trash"></i>
-                </button>
+                  <button
+                    @click="eliminarReservaHotel(reserva)"
+                    class="btn-action btn-delete"
+                    title="Eliminar"
+                  >
+                    <i class="bi bi-trash"></i>
+                    <span class="d-none d-lg-inline">Eliminar</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -1120,85 +1112,12 @@ const eliminarReservaHotel = async (reserva) => {
     />
 
     <!-- Modal Rechazar Reserva -->
-    <Teleport to="body">
-      <div
-        v-if="modalRechazarReservaOpen"
-        class="modal fade show d-block"
-        tabindex="-1"
-        style="background-color: rgba(0, 0, 0, 0.5)"
-        @click.self="cancelarRechazoReserva"
-      >
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">
-                <i class="bi bi-x-circle-fill me-2 text-danger"></i>
-                Rechazar Reserva
-              </h5>
-              <button
-                type="button"
-                class="btn-close"
-                @click="cancelarRechazoReserva"
-              ></button>
-            </div>
-            <div class="modal-body">
-              <div class="alert alert-warning">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                <strong>Importante:</strong> El motivo será enviado al huésped.
-              </div>
-
-              <div class="reserva-info-rechazo mb-3">
-                <p>
-                  <strong>Huésped:</strong>
-                  {{ reservaARechazar?.nombreHuesped }}
-                </p>
-                <p>
-                  <strong>Habitación:</strong>
-                  {{ reservaARechazar?.habitacionNombre }}
-                </p>
-                <p>
-                  <strong>Fechas:</strong> {{ reservaARechazar?.checkIn }} →
-                  {{ reservaARechazar?.checkOut }}
-                </p>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label">
-                  Motivo del rechazo <span class="text-danger">*</span>
-                </label>
-                <textarea
-                  v-model="motivoRechazoReserva"
-                  class="form-control"
-                  rows="4"
-                  placeholder="Ej: Lo sentimos, esas fechas ya no están disponibles. Por favor elige otras fechas..."
-                  required
-                ></textarea>
-                <small class="text-muted">
-                  Sé claro y cortés. El huésped recibirá este mensaje.
-                </small>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                @click="cancelarRechazoReserva"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                class="btn btn-danger"
-                @click="confirmarRechazoReserva"
-              >
-                <i class="bi bi-x-lg me-2"></i>
-                Rechazar Reserva
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Teleport>
+    <ModalRechazarReserva
+      :is-open="modalRechazarReservaOpen"
+      :reserva="reservaARechazar"
+      @close="cancelarRechazoReserva"
+      @confirmar="confirmarRechazoReserva"
+    />
   </div>
 </template>
 
