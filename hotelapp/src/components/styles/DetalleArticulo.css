@@ -1,0 +1,387 @@
+.breadcrumb-nav {
+  margin-bottom: 1.5rem;
+}
+
+.breadcrumb-link {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.breadcrumb-link:hover {
+  color: #764ba2;
+  transform: translateX(-5px);
+}
+
+.article-header {
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.category-badge-large {
+  display: inline-block;
+  padding: 0.5rem 1.25rem;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+.category-badge-large.turismo {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+.category-badge-large.gastronomia {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.category-badge-large.consejos {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.category-badge-large.eventos {
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+.category-badge-large.cultura {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.article-title {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #2d3561;
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+}
+
+.article-meta {
+  display: flex;
+  gap: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #f0f0f0;
+  margin-bottom: 1.5rem;
+}
+
+.author-info,
+.date-info,
+.views-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #999;
+  font-size: 0.95rem;
+}
+
+.author-info i,
+.date-info i,
+.views-info i {
+  color: #667eea;
+  font-size: 1.1rem;
+}
+
+.likes-info {
+  display: flex;
+  align-items: center;
+}
+
+.btn-like {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 30px;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  color: #e11d48;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.btn-like:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(225, 29, 72, 0.15);
+}
+
+.btn-like.active {
+  background: #ffe4ea;
+  border-color: #f9a8d4;
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.25);
+}
+
+.btn-like i {
+  font-size: 1.1rem;
+}
+
+.author-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.btn-action-edit,
+.btn-action-delete {
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  border: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-action-edit {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.btn-action-edit:hover {
+  background: #1976d2;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.btn-action-delete {
+  background: #ffebee;
+  color: #d32f2f;
+}
+
+.btn-action-delete:hover {
+  background: #d32f2f;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.featured-image {
+  width: 100%;
+  height: 500px;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 3rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.featured-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.article-content {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 3rem;
+}
+
+.article-body {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.article-summary {
+  font-size: 1.25rem;
+  color: #666;
+  font-weight: 500;
+  line-height: 1.7;
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.article-text {
+  color: #333;
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+.article-text p {
+  margin-bottom: 1.5rem;
+}
+
+.article-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: sticky;
+  top: 90px;
+  align-self: start;
+}
+
+.sidebar-card {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  /* remove sticky here to avoid overlap */
+  position: static;
+}
+
+.sidebar-title {
+  color: #2d3561;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.author-card {
+  text-align: center;
+}
+
+.author-avatar {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 3rem;
+}
+
+.author-name {
+  font-weight: 700;
+  color: #2d3561;
+  font-size: 1.1rem;
+}
+
+.share-buttons {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.share-btn {
+  padding: 0.75rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.25rem;
+  color: #fff;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.share-btn:hover {
+  transform: translateY(-2px);
+}
+
+.share-btn.facebook {
+  background: #1877f2;
+}
+
+.share-btn.twitter {
+  background: #1da1f2;
+}
+
+.share-btn.whatsapp {
+  background: #25d366;
+}
+
+.article-header,
+.article-title,
+.article-summary,
+.article-text,
+.article-text p,
+.article-meta,
+.article-meta span {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.draft-badge-inline {
+  font-size: 1.2rem;
+  color: #6b7280;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+
+@media (max-width: 991px) {
+  .article-title {
+    font-size: 2rem;
+  }
+
+  .article-content {
+    grid-template-columns: 1fr;
+  }
+
+  .article-sidebar {
+    position: static;
+  }
+
+  .featured-image {
+    height: 300px;
+  }
+
+  .article-meta {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .author-actions {
+    flex-wrap: wrap;
+  }
+
+  .btn-action-edit,
+  .btn-action-delete {
+    flex: 1;
+    min-width: 120px;
+  }
+}
+
+@media (max-width: 576px) {
+  .article-title {
+    font-size: 1.5rem;
+  }
+
+  .article-summary {
+    font-size: 1.05rem;
+  }
+
+  .article-text {
+    font-size: 1rem;
+  }
+
+  .article-body {
+    padding: 1.25rem;
+  }
+
+  .featured-image {
+    height: 220px;
+  }
+
+  .category-badge-large {
+    font-size: 0.8rem;
+    padding: 0.4rem 1rem;
+  }
+
+  .article-meta {
+    font-size: 0.85rem;
+    gap: 0.75rem;
+  }
+
+  .likes-info .btn-like {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .author-actions {
+    gap: 0.5rem;
+  }
+
+  .btn-action-edit,
+  .btn-action-delete {
+    padding: 0.65rem 1.25rem;
+    font-size: 0.85rem;
+  }
+
+  .draft-badge-inline {
+    font-size: 0.9rem;
+    display: block;
+    margin-left: 0;
+    margin-top: 0.5rem;
+  }
+}

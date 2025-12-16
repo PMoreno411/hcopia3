@@ -1,0 +1,55 @@
+:root {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  margin: 0;
+  background-color: #f8f9fa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Estilos para modales */
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  border-radius: 15px;
+  border: none;
+}
+
+.modal-header {
+  border-bottom: 1px solid #e9ecef;
+  padding: 1rem 1.5rem;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  border-top: 1px solid #e9ecef;
+  padding: 1rem 1.5rem;
+}
+
+/* Scroll suave en modales */
+.modal-dialog-scrollable .modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-dialog-scrollable .modal-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.modal-dialog-scrollable .modal-body::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.modal-dialog-scrollable .modal-body::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
